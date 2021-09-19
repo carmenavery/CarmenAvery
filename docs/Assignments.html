@@ -357,7 +357,7 @@ div.tocify {
 </div>
 <div id="assignment-1" class="section level1">
 <h1>Assignment 1</h1>
-<p><strong>Collaborators: Lorem Ipsum. </strong></p>
+<p><strong>Collaborators: Rachael Villari, Elizabeth Stoner, and Halle Wasser</strong></p>
 <p>This assignment is due on Canvas on Monday 9/20 before class, at 10:15 am. Include the name of anyone with whom you collaborated at the top of the assignment.</p>
 <div id="problem-1" class="section level3">
 <h3>Problem 1</h3>
@@ -417,7 +417,7 @@ div.tocify {
 ##    7.30   15.07   20.10   21.23   26.18   46.00</code></pre>
 <p><strong>Answer: The mean number of assault arrests is 170.8 per 100,000, and the median is 159 assault arrests per 100,000. The mean number of rape arrests is 21.23 per 100,000, and the median is 20.1 rape arrests per 100,000.</strong></p>
 <p>What does the command par do, in your own words (you can look this up by asking R <code>?par</code>)?</p>
-<p>Answer: There are a lot of graphical features in R. Par() allows us to search and set them.</p>
+<p><strong>Answer: There are a lot of graphical features in R. Par() allows us to search and set them.</strong></p>
 <pre class="r"><code>par(mfrow=c(3,1))
 hist(dat$Murder, main=&quot;Histogram of Murder Arrests&quot;, xlab=&quot;Murder Arrests \n 
      per 100,000&quot;, ylab=&quot;Frequency&quot;)
@@ -427,20 +427,21 @@ hist(dat$Rape, main=&quot;Histogram of Rape Arrests&quot;, xlab=&quot;Rape Arres
      per 100,000&quot;, ylab=&quot;Frequency&quot;)</code></pre>
 <p><img src="Assignments_files/figure-html/unnamed-chunk-10-1.png" width="480" /></p>
 <p>What can you learn from plotting the histograms together?</p>
-<p>**Answer:</p>
+<p><strong>Answer: Murder and rape arrests are right skewed, which is good. What I thought was interesting were how the assault arrests are pretty normally distributed. Additionally, I see the average assault arrests per 100,000 were much greater than the average murder or rape arrests per 100,000 which makes sense.</strong></p>
 </div>
 <div id="problem-8" class="section level3">
 <h3>Problem 8</h3>
 <p>In the console below (not in text), type <code>install.packages("maps")</code> and press Enter, and then type <code>install.packages("ggplot2")</code> and press Enter. This will install the packages so you can load the libraries.</p>
 <p>Run this code:</p>
-<pre class="r"><code>library(&#39;maps&#39;) 
-library(&#39;ggplot2&#39;) 
+<pre class="r"><code>library(&#39;maps&#39;) # load maps library into R session
+library(&#39;ggplot2&#39;) # load ggplot2 into R session
 
-ggplot(dat, aes(map_id=state, fill=Murder)) + 
-  geom_map(map=map_data(&quot;state&quot;)) + 
-  expand_limits(x=map_data(&quot;state&quot;)$long, y=map_data(&quot;state&quot;)$lat)</code></pre>
+ggplot(dat, aes(map_id=state, fill=Murder)) + # call ggplot function, use dat 
+                                              # dataframe, and set up plot aesthetics
+  geom_map(map=map_data(&quot;state&quot;)) + # create map of all states
+  expand_limits(x=map_data(&quot;state&quot;)$long, y=map_data(&quot;state&quot;)$lat) # expand plot limits</code></pre>
 <p>What does this code do? Explain what each line is doing.</p>
-<p>Answer:</p>
+<p><strong>Answer: This code is creating a heat map of the murder arrests per 100,000 in each state. See comments for a description of each line of code.</strong></p>
 <p><span class="math display">\[\\[2in]\]</span></p>
 </div>
 </div>

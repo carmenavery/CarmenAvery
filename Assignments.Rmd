@@ -1,15 +1,15 @@
 ---
 title: "Assignments"
 output:
+  pdf_document:
+    toc: no
+    toc_depth: '1'
   html_document:
     toc: yes
     toc_float: yes
     collapsed: no
     number_sections: no
     toc_depth: 1
-  pdf_document:
-    toc: no
-    toc_depth: '1'
 ---
 
 
@@ -38,7 +38,7 @@ I want you to submit your assignment as a PDF, so I can keep a record of what th
 
 # Assignment 1
 
-**Collaborators: Lorem Ipsum. **
+**Collaborators: Rachael Villari, Elizabeth Stoner, and Halle Wasser**
 
 This assignment is due on Canvas on Monday 9/20 before class, at 10:15 am. Include the name of anyone with whom you collaborated at the top of the assignment.
 
@@ -48,6 +48,7 @@ This assignment is due on Canvas on Monday 9/20 before class, at 10:15 am. Inclu
 Install the datasets package on the console below using `install.packages("datasets")`. Now load the library.
 
 ```{r}
+library(knitr)
 library(datasets)
 ```
 
@@ -145,7 +146,7 @@ summary(dat$Rape)
 
 What does the command par do, in your own words (you can look this up by asking R `?par`)?
 
-Answer: There are a lot of graphical features in R. Par() allows us to search and set them.
+**Answer: There are a lot of graphical features in R. Par() allows us to search and set them.**
 
 ```{r, echo = TRUE, fig.width = 5, fig.height = 8}
 par(mfrow=c(3,1))
@@ -159,7 +160,11 @@ hist(dat$Rape, main="Histogram of Rape Arrests", xlab="Rape Arrests \n
 
 What can you learn from plotting the histograms together?
 
-**Answer: 
+**Answer: Murder and rape arrests are right skewed, which is good. What I thought
+          was interesting were how the assault arrests are pretty normally distributed.
+          Additionally, I see the average assault arrests per 100,000 were 
+          much greater than the average murder or rape arrests per 100,000 which 
+          makes sense.**
   
 ### Problem 8
 
@@ -168,17 +173,19 @@ In the console below (not in text), type `install.packages("maps")` and press En
 Run this code:
 
 ```{r, eval = FALSE, fig.width = 7.5, fig.height = 4}
-library('maps') 
-library('ggplot2') 
+library('maps') # load maps library into R session
+library('ggplot2') # load ggplot2 into R session
 
-ggplot(dat, aes(map_id=state, fill=Murder)) + 
-  geom_map(map=map_data("state")) + 
-  expand_limits(x=map_data("state")$long, y=map_data("state")$lat)
+ggplot(dat, aes(map_id=state, fill=Murder)) + # call ggplot function, use dat 
+                                              # dataframe, and set up plot aesthetics
+  geom_map(map=map_data("state")) + # create map of all states
+  expand_limits(x=map_data("state")$long, y=map_data("state")$lat) # expand plot limits
 ```
 
 What does this code do? Explain what each line is doing.
 
-Answer:
+**Answer: This code is creating a heat map of the murder arrests per 100,000 in 
+          each state. See comments for a description of each line of code.**
 
 $$\\[2in]$$
 
