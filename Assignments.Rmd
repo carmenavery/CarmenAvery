@@ -58,6 +58,9 @@ Load the USArrests dataset and rename it `dat`. Note that this dataset comes wit
 dat <- USArrests
 ```
 
+**Answer: Renaming the dataset provides a short-hand way of calling it as I code
+          instead of trying to remember the name of the dataset.**
+
 ### Problem 2
 
 Use this command to make the state names into a new variable called State. 
