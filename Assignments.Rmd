@@ -197,6 +197,106 @@ $$\\[2in]$$
 
 # Assignment 2 
 
-(Coming soon)
+### Problem 1
+```{r}
+#load library
+library(ggplot2)
+# Read the data
+dat <- read.csv(file = 'dat.nsduh.small.1.csv')
+```
+
+What are the dimensions of the dataset? 
+```{r}
+nrow(dat)
+ncol(dat)
+names(dat)
+```
+
+**Answer: This dataset contains 171 rows/observations and 7 columns.**
+
+### Problem 2
+
+What is this dataset about? Who collected the data, what kind of sample is it, and what was the purpose of generating the data?
+
+**Answer: This dataset is a sample  of the 2019 National Survey of Drug Use and Health (NSDUH). According to their website (https://nsduhweb.rti.org/respweb/about_nsduh.html), NSDUH is sponsored by the Substance Abuse and Mental Health Services Administration (SAMHSA) and the US Dept. of Health and Human Services, and it serves as a sample to inform policymakers of tobacco, alcohol, and drug use in the US population as well as other health related concerns.
+Their website also states that they survey approximately 70,000 people each year ages 12 and up. The variables of the provided dataset are as follows: 'mjage', 'cigage', 'iralcage', 'age2', 'sexatract', 'speakengl', and 'irsex'. 'Mjage', 'cigage', and 'iralcage' refer to the age at which participants first started using marijuana or hashish, cigarrettes, and alcohol, respectively. The 'age2' variable is the age of the respondent at the end of the questionnaire. 'Sexatract', 'speakengl', and 'irsex' are the respondent's sexual attraction/orientation, English speaking level, and gender.**
+
+### Problem 3: Age and gender
+
+What is the age distribution of the sample like?
+
+```{r}
+hist(dat$age2, xlab = 'Age Category', main = 'Histogram of Age')
+summary(dat$age2)
+dat %>% group_by(age2) %>% count()
+```
+It appears to be left skewed, and it looks like there's a peak at 15 which the codebook describes as being 35-49 years old. This means that the majority of the people within this dataset are not teenagers.
+
+Do you think this age distribution representative of the US population? Why or why  not?
+No, because this is a very small sample size (171 people), and it wouldn't be representative of the millions of people that live in the US. Additionally, the NSDUH only surveys people aged 12 and older meaning children under 12 would be excluded from the age distribution. Also there are not many teens or people in their early twenties represented by this dataset.
+
+Is the sample balanced in terms of gender? If not, are there more females or males?
+
+```{r}
+hist(dat$irsex, xlab = 'Gender (1 = Male, 2 = Female)', main = 'Distribution of Gender')
+dat %>% count(irsex)
+```
+
+**Answer: No, the sample is not balanced in terms of gender. There are more males (91 total) than females (80 total).**
+
+```{r}
+tab.agesex <- table(dat$irsex, dat$age2)
+barplot(tab.agesex,
+        main = "Stacked barchart",
+        xlab = "Age category", ylab = "Frequency",
+        legend.text = rownames(tab.agesex),
+        beside = FALSE) # Stacked bars (default)
+```
+
+**Answer: It's difficult to be certain by just looking at this bar plot, but visually it appears as though this dataset contains males who are older and females who are younger. For example, the age categories of 14, 16, and 17 look to have more men than women while categories 8, 9, 10, 11, and 12 seem to have more females than males. This might also be because there are more males than females in this dataset. However, it is clear that the main age categories in this dataset are 13-17.**
+
+### Problem 4: Substance use
+
+For which of the three substances included in the dataset (marijuana, alcohol, and cigarettes) do individuals tend to use the substance earlier?
+
+```{r}
+summary(dat$mjage)
+summary(dat$cigage)
+summary(dat$iralcage)
+hist(dat$mjage, xlab = 'Age Category of First Marijuana Usage', main = 'Distribution of First Marijuana Usage Age')
+hist(dat$cigage, xlab = 'Age Category of First Cigarrete Usage', main = 'Distribution of First Cigarrete Usage Age')
+hist(dat$iralcage,  xlab = 'Age Category of First Alcohol Usage', main = 'Distribution of First Alcohol Usage Age')
+```
+
+**Answer: From the summary statistics and the histograms, it looks like people tend to use alcohol earlier than cigarettes or marijuana, mainly around the age category of 15 (35-49 years old).**
+
+### Question 5
+
+```{r}
+
+```
+
+```{r}
+
+```
 
 
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
