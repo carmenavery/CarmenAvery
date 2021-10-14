@@ -19,23 +19,13 @@ output: html_document
 
 # **Carmen Avery**
 
-This is a template example for lab journaling. Students in Matt Crump's Human Cognition and Performance Lab will use this template to learn R, and other things. Students can replace this text with more fun things. People not in my lab can use this too.
-
-## How to use
-
-1. fork the repo for this website and follow instructions on read me to get set up. [https://github.com/CrumpLab/LabJournalWebsite](https://github.com/CrumpLab/LabJournalWebsite)
-
-2. Blog/journal what you are doing in R, by editing the Journal.Rmd. See the [Journal page](https://crumplab.github.io/LabJournalWebsite/Journal.html) for an example of what to do to get started learning R.
-
-3. See the [links page](https://crumplab.github.io/LabJournalWebsite/Links.html) for lots of helpful links on learning R.
-
-4. Change everything to make it your own.
+I'm a senior in Wharton studying Business Analytics and Marketing! This is my portfolio website for personal and class projects, including CRIM 250 (Statistics for the Social Sciences) assignments. Website template forked from [https://github.com/CrumpLab/LabJournalWebsite](https://github.com/CrumpLab/LabJournalWebsite)
 
 
 </div>
 <div class="col-sm-6">
 
-### [Crump Lab: Human Cognition and Performance](https://crumplab.github.io)
+
 
 <a href = "https://crumplab.github.io">
 ![](images/logo.png)
