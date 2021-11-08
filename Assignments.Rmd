@@ -464,5 +464,592 @@ __Answer: It might be because the ones that are recorded have missing values whi
 c. Regarding missing values in problem 4, do you see any? If so, do you think that's all that's missing from the data?
 __Answer: Yes, there were some, and I think there are more missing values in the dataset.__
 
+# Exam 2
+
+Data description: This dataset provides (simulated) data about 200 police departments in one year. It contains information about the funding received by the department as well as incidents of police brutality. Suppose this dataset (sim.data.csv) was collected by researchers to answer this question: **"Does having more funding in a police department lead to fewer incidents of police brutality?"**
+d. Codebook:
+- funds: How much funding the police department received in that year in millions of dollars.
+- po.brut: How many incidents of police brutality were reported by the department that year.
+- po.dept.code: Police department code
+
+### Problem 1: EDA (10 points) 
+
+Describe the dataset and variables. Perform exploratory data analysis for the two variables of interest: funds and po.brut.
+```{r}
+#load libraries
+library(knitr)
+library(ggplot2)
+library(tidyverse)
+```
+
+```{r}
+dat <- read.csv(file = 'sim.data.csv')
+dim(dat)
+sum(is.na(dat$po.dept.code))
+sum(is.na(dat$funds))
+sum(is.na(dat$po.brut))
+```
+
+__Answer: This dataset set contains 200 observations (rows), and each of them represents a police department. The columns (3 total) are attributes of each police department, and they include funds (funding received in millions of dollars for that year), po.brut (number of reported incidents of police brutality) for that year, and po.dept.code (id number for the department, most likely to protect privacy and confidentiality). There are no missing (n/a) values in this dataset.__
 
 
+```{r}
+summary(dat)
+```
+__Answer: It's interesting that in this dataset, police departments received at least $21.4 million for that year, and average is $61.04 million. It's also interesting to that that at least one department reported 0 incidences of police brutality, and the highest number of incidences reported for that year was 22. It's concerning that the average number of incidences is 18.14.__
+
+```{r}
+dat %>% ggplot(aes(x=funds)) + geom_histogram() +
+                               xlab("Funds (millions of dollars)") +
+                               ggtitle("Distribution of Funds")
+dat %>% ggplot(aes(x=po.brut)) + geom_histogram() + 
+                                 xlab("Number of Reported Incidences of Police Brutality") +
+                                 ggtitle("Distribution of Police Brutality Incidences")
+```
+__Answer: These histograms show possible outliers in both funding and number of police brutality incidences. The distribution of funds looks to be possibly bimodal, and the distribution of police brutality looks to be slightly left skewed. These are subjective observations of the graph, but if given a larger sample, these graphs will be more representative of the population distribution of these variables.__
+
+```{r}
+dat %>% ggplot(aes(x=funds, y=po.brut)) + geom_point() + ggtitle("Scatterplot of Police Brutality vs. Funds")
+cor(dat$funds, dat$po.brut)
+```
+__Answer: There looks to be a strong negative relationship between funds and po.brut, but it's concerning that the relationship doesn't look linear.__
+
+### Problem 2: Linear regression (30 points)
+
+a. Perform a simple linear regression to answer the question of interest. To do this, name your linear model "reg.output" and write the summary of the regression by using "summary(reg.output)". 
+
+```{r}
+# Remember to remove eval=FALSE!!
+reg.output <- lm(po.brut ~ funds, data = dat)
+summary(reg.output)
+```
+
+b. Report the estimated coefficient, standard error, and p-value of the slope. Is the relationship between funds and incidents statistically significant? Explain.
+
+__Answer: The estimated coefficient is -0.367099, standard error is 0.004496, and the p-value is <2e-16, which is almost 0. Since the p-value is less than alpha (0.05), we are able to reject the null hypothesis that there is no association between police brutality and funds which means this relationship is statistically significant. Additionally the R-squared of the model is very high which indicates this model fits the data well.__
+
+c. Draw a scatterplot of po.brut (y-axis) and funds (x-axis). Right below your plot command, use abline to draw the fitted regression line, like this:
+```{r, fig.width=4, fig.height=4}
+# Remember to remove eval=FALSE!!
+plot(dat$funds, dat$po.brut, xlab = "Funds (millions of dollars)", ylab = "Number of Reported Incidences of Police Brutality", main = "Scatterplot of Police Brutality vs. Funds")
+abline(reg.output, col = "red", lwd=2)
+```
+Does the line look like a good fit? Why or why not?
+
+__Answer: No, it does not show a good fit because the data looks curved, and since this is a linear model, it does not fit the data properly. The R-squared is high because the linear fit does model quite a bit of the data, but it fails to capture the overall trend. If there were more observations, this might be the case. Perhaps transformation would be appropriate to apply to capture the fit of the data, but this runs the risk of overfitting. Given the size of the dataset, it would be most beneficial to split the data into test and training data to cross validate.__
+
+d. Are the four assumptions of linear regression satisfied? To answer this, draw the relevant plots. (Write a maximum of one sentence per assumption.) If not, what might you try to do to improve this (if you had more time)?
+
+```{r}
+#residuals vs fitted plots
+plot(reg.output, which = 1)
+#scale location plot
+plot(reg.output, which = 3)
+#residuals vs x plot
+plot(dat$funds, reg.output$residuals, main = "Residuals vs. X", xlab = "X (Funding in Millions of Dollars)", ylab = "Residuals") 
+```
+
+__Answer: The linearity assumption is not met because the scatterplot of po.brut vs. funds shows a curved relationship over a linear one, and the residuals vs. x and residuals vs. fitted plots show a distinguishable curved pattern. The independence assumption is not met because there is a pattern shown in the residuals vs. x plot. The equal variance assumption is not satisfied since there are significant trends in the residuals vs. fitted and scale location plots. __
+
+```{r}
+plot(reg.output, which = 5)
+plot(reg.output, which = 2)
+```
+__Answer: The normality assumption is violated because the QQ plot does not show a straight line like we want. Since none of the assumptions are met, I would apply a transformation to the model to see if it will help satisfy the assumptions, and to choose which transformation, I would use the Box-Cox method.__
+
+e. Answer the question of interest based on your analysis.
+
+__Answer: Since none of the assumptions are met, the p-value obtained by the model are optimistic which means the model can't be used for inference. If the assumptions were met, there would be an associated decrease of reported incidences of police brutality by 0.367099 when funding increases by $1 million. It is possible that it works well for prediction, but as mentioned above, the best way to make sure is to partition the data into test and train. However, with a larger sample size or with transformations, it's possible the model can be used for statistical inference.__
+
+### Problem 3: Data ethics (10 points)
+
+Describe the dataset. Considering our lecture on data ethics, what concerns do you have about the dataset? Once you perform your analysis to answer the question of interest using this dataset, what concerns might you have about the results?
+
+__Answer: This dataset contains the funding in millions of dollars for the given year as well as the number of reported incidences of police brutality report by each police department. As discussed in class, the databases of police departments are prone to bias due to the biases of officers. This shows up in predictive policing where the predicted area of crime is overrepresented. Since the incidences of police brutality are reported by each department, this data may be biased and therefore produce biased results (garbage in, garbage out). This data might not completely capture the true amount of police brutality occurring since it may be underreported. It would be interesting if a separate organization is able to cross check this data with a different database of police brutality that is not recorded by police. This would hold police departments accountable in recording data and it would provide a level of fairness.__
+
+# Assignment 4
+
+```{r}
+#install and load tidyverse library
+#install.packages("tidyverse")
+library(tidyverse)
+```
+
+```{r}
+ggplot(data = mpg) + #call ggplot function and load data as argument
+  geom_point(mapping = aes(x = displ, y = hwy)) #plot a scatterplot of hwy vs displ
+```
+
+```{r}
+ggplot(data = mpg) + #call ggplot function and load data as argument
+  geom_point(mapping = aes(x = displ, y = hwy, color = class)) #plot a scatterplot of hwy vs displ by class categories visualized as different colors
+```
+
+```{r}
+ggplot(data = mpg) + #call ggplot function and load data as argument
+  geom_point(mapping = aes(x = displ, y = hwy, size = class)) #plot a scatterplot of hwy vs displ by class categories visualized as different size points
+```
+
+```{r}
+ggplot(data = mpg) + #call ggplot function and load data as argument
+  geom_point(mapping = aes(x = displ, y = hwy, alpha = class)) #plot a scatterplot of hwy vs displ with class categories visualized as different shades of transparency
+```
+
+```{r}
+ggplot(data = mpg) + #call ggplot function and load data as argument
+  geom_point(mapping = aes(x = displ, y = hwy, shape = class)) #plot a scatterplot of hwy vs displ with class categories visualized as different shapes
+```
+
+```{r}
+ggplot(data = mpg) + #call ggplot function and load data as argument
+  geom_point(mapping = aes(x = displ, y = hwy), color = "blue") #plot a scatterplot of hwy vs displ with blue pointsx
+```
+
+```{r}
+ggplot(data = mpg) + #call ggplot function and load data as argument
+  geom_point(mapping = aes(x = displ, y = hwy, color = "blue")) #plot a scatterplot of hwy vs displ with legend=blue
+```
+
+```{r}
+#do not put "+" at the beginning of a line, always at the end
+#ggplot(data = mpg) #call ggplot function and load data as argument
+#+ geom_point(mapping = aes(x = displ, y = hwy))
+```
+
+```{r}
+ggplot(data = mpg) + #call ggplot function and load data as argument
+  geom_point(mapping = aes(x = displ, y = hwy)) + #plot a scatterplot of hwy vs displ
+  facet_wrap(~ class, nrow = 2) #create multiple scatterplots of hwy vs displ across different class categories
+```
+
+```{r}
+ggplot(data = mpg) + #call ggplot function and load data as argument
+  geom_point(mapping = aes(x = displ, y = hwy)) + #plot a scatterplot of hwy vs displ
+  facet_grid(drv ~ cyl) #create multiple scatterplots of hwy vs displ across different categories (drv and cyl)
+```
+
+```{r}
+ggplot(data = mpg) + #call ggplot function and load data as argument
+  geom_smooth(mapping = aes(x = displ, y = hwy)) #plot a line of best fit of hwy vs displ
+```
+
+```{r}
+ggplot(data = mpg) + #call ggplot function and load data as argument
+  geom_smooth(mapping = aes(x = displ, y = hwy, linetype = drv)) #plot a line of best fit of hwy vs displ based on drive train types
+```
+
+```{r}
+ggplot(data = mpg) + #call ggplot function and load data as argument
+  geom_smooth(mapping = aes(x = displ, y = hwy, linetype = drv, color = drv), show.legend = FALSE) #plot a line of best fit of hwy vs displ based on drive train types in different colors and excluding the legend
+```
+
+```{r}
+ggplot(data = mpg) + #call ggplot function and load data as argument
+  geom_point(mapping = aes(x = displ, y = hwy)) + #plot a scatterplot of hwy vs displ
+  geom_smooth(mapping = aes(x = displ, y = hwy)) #adding a line of best fit on top of scatterplot
+
+```
+
+```{r}
+#another way of writing the previous function
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + #creates aesthetics of the plot
+  geom_point() + #scatterplot of hwy vs displ
+  geom_smooth() #line of fit over scatterplot
+```
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + #creates aesthetics of the plot
+  geom_point(mapping = aes(color = class)) +#scatterplot of hwy vs displ with color dividing classes
+  geom_smooth() #line of fit over scatterplot
+```
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + #creates aesthetics of the plot
+  geom_point(mapping = aes(color = class)) +#scatterplot of hwy vs displ with color dividing classes
+  geom_smooth(data = filter(mpg, class == "subcompact"), se = FALSE) #line of fit over scatterplot for only subcompact cars
+```
+
+```{r}
+ggplot(data = diamonds) + #call ggplot function and load data as argument
+  geom_bar(mapping = aes(x = cut)) #bar chart of diamond cuts
+```
+
+```{r}
+ggplot(data = diamonds) + #call ggplot function and load data as argument
+  stat_count(mapping = aes(x = cut)) #bar chart of diamond cuts using stat_count
+```
+
+```{r}
+demo <- tribble( #create data
+  ~cut,         ~freq,
+  "Fair",       1610,
+  "Good",       4906,
+  "Very Good",  12082,
+  "Premium",    13791,
+  "Ideal",      21551
+) 
+
+ggplot(data = demo) + #call ggplot function and load data as argument
+  geom_bar(mapping = aes(x = cut, y = freq), stat = "identity") #bar chart of diamond cuts and frequency
+```
+
+```{r}
+ggplot(data = diamonds) + #call ggplot function and load data as argument
+  geom_bar(mapping = aes(x = cut, y = stat(prop), group = 1)) #bar chart of diamond cuts by proportion
+```
+
+```{r}
+ggplot(data = diamonds) + #call ggplot function and load data as argument
+  stat_summary( #plot summary stats of each diamond cut category
+    mapping = aes(x = cut, y = depth), #aesthetics of the plot
+    fun.min = min, #min of each category
+    fun.max = max,#max of each category
+    fun = median#median of each category
+  )
+```
+
+```{r}
+ggplot(data = diamonds) + #call ggplot function and load data as argument
+  geom_bar(mapping = aes(x = cut, colour = cut)) #bar chart of diamond cuts with bars outlined in color
+ggplot(data = diamonds) + #call ggplot function and load data as argument
+  geom_bar(mapping = aes(x = cut, fill = cut)) #bar chart of diamond cuts with bars filled with color
+```
+
+```{r}
+ggplot(data = diamonds) + #call ggplot function and load data as argument
+  geom_bar(mapping = aes(x = cut, fill = clarity)) #bar chart of diamond cuts with bar color filling for each clarity category
+```
+
+```{r}
+ggplot(data = diamonds, mapping = aes(x = cut, fill = clarity)) + #call ggplot function and load data as argument with aesthetics
+  geom_bar(alpha = 1/5, position = "identity") #barchart of cuts and divided into semitransparent clarity categories
+ggplot(data = diamonds, mapping = aes(x = cut, colour = clarity)) + #call ggplot function and load data as argument with aesthetics
+  geom_bar(fill = NA, position = "identity") #barchart of cuts and divided into transparent clarity categories
+```
+
+```{r}
+ggplot(data = diamonds) + #call ggplot function and load data as argument
+  geom_bar(mapping = aes(x = cut, fill = clarity), position = "fill") #bar chart of diamond cuts with all one height to compare proportions of clarity across cuts
+```
+
+```{r}
+ggplot(data = diamonds) + #call ggplot function and load data as argument
+  geom_bar(mapping = aes(x = cut, fill = clarity), position = "dodge") #bar chart of diamond cuts with distribution of clarity for each cut
+```
+
+```{r}
+ggplot(data = mpg) +  #call ggplot function and load data as argument
+  geom_point(mapping = aes(x = displ, y = hwy), position = "jitter") #scatterplot of hwy vs displ with points jittered randomly
+```
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = class, y = hwy)) + #call ggplot function and load data as argument and sets aesthetics
+  geom_boxplot() #boxplot of class and hwy
+ggplot(data = mpg, mapping = aes(x = class, y = hwy)) + #call ggplot function and load data as argument and sets aesthetics
+  geom_boxplot() + #boxplot of class and hwy
+  coord_flip() #flips x and y of plot
+```
+```{r}
+nz <- map_data("nz") #create dataframe
+
+ggplot(nz, aes(long, lat, group = group)) + #call ggplot with data and set aesthetics
+  geom_polygon(fill = "white", colour = "black") #create map with white fill and black outline
+
+ggplot(nz, aes(long, lat, group = group)) + #call ggplot with data and set aesthetics
+  geom_polygon(fill = "white", colour = "black") + #create map with white fill and black outline
+  coord_quickmap() #sets aspect ratio
+```
+
+```{r}
+bar <- ggplot(data = diamonds) + #creates bar, calls ggplot and loads data
+  geom_bar( #bar chart
+    mapping = aes(x = cut, fill = cut), #barchart of cut
+    show.legend = FALSE, #don't show legend
+    width = 1
+  ) + 
+  theme(aspect.ratio = 1) + #color graph with theme
+  labs(x = NULL, y = NULL) #null x and y labels
+
+bar + coord_flip() #flip x and y
+bar + coord_polar() #use polar coordinates
+```
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) + #call ggplot, load data, and create aesthetics
+  geom_point(aes(color = class)) + #scatterplot of hwy vs displ with color = class
+  geom_smooth(se = FALSE) + #line of fit without standard error
+  labs(title = "Fuel efficiency generally decreases with engine size") #add title
+```
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) + #call ggplot, load data, and create aesthetics
+  geom_point(aes(color = class)) + #scatterplot of hwy vs displ with color = class
+  geom_smooth(se = FALSE) + #line of fit without standard error
+  labs(
+    title = "Fuel efficiency generally decreases with engine size",
+    subtitle = "Two seaters (sports cars) are an exception because of their light weight",
+    caption = "Data from fueleconomy.gov"
+  ) #add title, subtitle, and caption
+```
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) + #call ggplot, load data, and create aesthetics
+  geom_point(aes(color = class)) + #scatterplot of hwy vs displ with color = class
+  geom_smooth(se = FALSE) + #line of fit without standard error
+  labs(
+    x = "Engine displacement (L)",
+    y = "Highway fuel economy (mpg)",
+    colour = "Car type"
+  ) #add x, y, and legend labels
+```
+
+```{r}
+df <- tibble(
+  x = runif(10),
+  y = runif(10)
+) #create data
+ggplot(df, aes(x, y)) + #ggplot, load data
+  geom_point() + #scatterplot of y vs x
+  labs(
+    x = quote(sum(x[i] ^ 2, i == 1, n)),
+    y = quote(alpha + beta + frac(delta, theta))
+  ) #create labels for mathmetical expressions for x and y
+```
+
+```{r}
+best_in_class <- mpg %>% #create best_in_class data
+  group_by(class) %>%
+  filter(row_number(desc(hwy)) == 1) #filter
+
+ggplot(mpg, aes(displ, hwy)) + #ggplot, load data, and set aesthetics
+  geom_point(aes(colour = class)) + #scatterplot of hwy vs displ with color = class
+  geom_text(aes(label = model), data = best_in_class) #create labels for points in best_in_class
+```
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) + #ggplot, load data, and set aesthetics
+  geom_point(aes(colour = class)) + #scatterplot of hwy vs displ with color = class
+  geom_label(aes(label = model), data = best_in_class, nudge_y = 2, alpha = 0.5) #create labels for points in best_in_class and adjust so they're not overlapping
+```
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) + #ggplot, load data, and set aesthetics
+  geom_point(aes(colour = class)) + #scatterplot of hwy vs displ with color = class
+  geom_point(size = 3, shape = 1, data = best_in_class) + #adjust size and data
+  ggrepel::geom_label_repel(aes(label = model), data = best_in_class) #create labels for points in best_in_class and adjust so they're not overlapping
+```
+
+```{r}
+class_avg <- mpg %>% #create class_avg dataframe
+  group_by(class) %>%
+  summarise(
+    displ = median(displ),
+    hwy = median(hwy)
+  )
+#> `summarise()` ungrouping output (override with `.groups` argument)
+
+ggplot(mpg, aes(displ, hwy, colour = class)) + #ggplot, data load, and set aesthetics
+  ggrepel::geom_label_repel(aes(label = class), #create labels
+    data = class_avg,
+    size = 6,
+    label.size = 0,
+    segment.color = NA
+  ) +
+  geom_point() + #scatterplot of hwy vs displ
+  theme(legend.position = "none") #color with theme
+```
+
+```{r}
+label <- mpg %>% #create label dataframe
+  summarise(
+    displ = max(displ),
+    hwy = max(hwy),
+    label = "Increasing engine size is \nrelated to decreasing fuel economy."
+  )
+
+ggplot(mpg, aes(displ, hwy)) + #ggplot, data load, and set aesthetics
+  geom_point() + #scatterplot of hwy vs displ
+  geom_text(aes(label = label), data = label, vjust = "top", hjust = "right") #create text label
+```
+
+```{r}
+label <- tibble( #create label dataframe
+  displ = Inf,
+  hwy = Inf,
+  label = "Increasing engine size is \nrelated to decreasing fuel economy."
+)
+
+ggplot(mpg, aes(displ, hwy)) + #ggplot, data load, and set aesthetics
+  geom_point() + #scatterplot of hwy vs displ
+  geom_text(aes(label = label), data = label, vjust = "top", hjust = "right") #create text labels on the border
+```
+
+```{r} 
+#add line breaks given the number of characters chosen per line
+"Increasing engine size is related to decreasing fuel economy." %>%
+  stringr::str_wrap(width = 40) %>%
+  writeLines()
+#> Increasing engine size is related to
+#> decreasing fuel economy.
+```
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) + #ggplot, data load, and set aesthetics
+  geom_point(aes(colour = class)) #scatterplot of hwy vs displ with class color differentiation
+
+#default scales of the above plot (behind the scenes)
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(aes(colour = class)) +
+  scale_x_continuous() +
+  scale_y_continuous() +
+  scale_colour_discrete()
+```
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) + #ggplot, data load, and set aesthetics
+  geom_point() + #scatterplot of hwy vs displ
+  scale_y_continuous(breaks = seq(15, 40, by = 5)) #controls position of ticks in plot
+```
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) + #ggplot, data load, and set aesthetics
+  geom_point() + #scatterplot of hwy vs displ
+  scale_x_continuous(labels = NULL) + #no labels for ticks on x axis
+  scale_y_continuous(labels = NULL) #no labels for ticks on y axis
+```
+
+```{r}
+presidential %>%
+  mutate(id = 33 + row_number()) %>%
+  ggplot(aes(start, id)) +
+    geom_point() + #scatterplot of id vs start
+    geom_segment(aes(xend = end, yend = id)) + #scale of plot
+    scale_x_date(NULL, breaks = presidential$start, date_labels = "'%y") #controls ticks and labels of x axis
+```
+
+```{r}
+base <- ggplot(mpg, aes(displ, hwy)) +  #ggplot, data load, and set aesthetics
+  geom_point(aes(colour = class)) #scatterplot of hwy vs displ with class differentiation
+
+base + theme(legend.position = "left") #legend on left
+base + theme(legend.position = "top") #legend on top
+base + theme(legend.position = "bottom") #legend on bottom
+base + theme(legend.position = "right") # the default
+```
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) + #ggplot, data load, and set aesthetics
+  geom_point(aes(colour = class)) + #scatterplot of hwy vs displ with class differentiation
+  geom_smooth(se = FALSE) + #line of fit without standard error
+  theme(legend.position = "bottom") + #position of legend at bottom
+  guides(colour = guide_legend(nrow = 1, override.aes = list(size = 4))) #layout of legend in 1 row
+#> `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+```
+
+```{r}
+ggplot(diamonds, aes(carat, price)) + #ggplot, data load, and set aesthetics
+  geom_bin2d() #heatmap of 2d bins
+
+ggplot(diamonds, aes(log10(carat), log10(price))) + #ggplot, data load, and log of aesthetics
+  geom_bin2d() #heatmap of 2d bins
+```
+
+```{r}
+ggplot(diamonds, aes(carat, price)) + #ggplot, data load, set aesthetics
+  geom_bin2d() + #heatmap of 2d bins
+  scale_x_log10() + #log10 of x scale
+  scale_y_log10() #log10 of y scale
+```
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) + #ggplot, data load, set aesthetics
+  geom_point(aes(color = drv)) #scatterplot of hwy vs displ with drv color category differentiation
+
+ggplot(mpg, aes(displ, hwy)) + #ggplot, data load, set aesthetics
+  geom_point(aes(color = drv)) + #scatterplot of hwy vs displ with drv color category differentiation
+  scale_colour_brewer(palette = "Set1") #scale by color
+```
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) + #ggplot, data load, set aesthetics
+  geom_point(aes(color = drv, shape = drv)) + #scatterplot of hwy vs displ with drv color category and shape differentiation
+  scale_colour_brewer(palette = "Set1") #scale by color
+```
+
+```{r}
+presidential %>%
+  mutate(id = 33 + row_number()) %>% #select columns and rows
+  ggplot(aes(start, id, colour = party)) + #ggplot, data load, set aesthetics
+    geom_point() + #scatterplot
+    geom_segment(aes(xend = end, yend = id)) + #segment plot
+    scale_colour_manual(values = c(Republican = "red", Democratic = "blue")) #color scale for certain points
+```
+
+```{r}
+df <- tibble( #create data
+  x = rnorm(10000),
+  y = rnorm(10000)
+)
+ggplot(df, aes(x, y)) + #ggplot, data load, set aesthetics
+  geom_hex() + #create hexagonal shape
+  coord_fixed() #fixed aspect ratio
+
+ggplot(df, aes(x, y)) + #ggplot, data load, set aesthetics
+  geom_hex() + #create hexagonal shape
+  #viridis::scale_fill_viridis() + #contrasting colors in shape
+  coord_fixed() #fixed aspect ratio
+```
+
+```{r}
+ggplot(mpg, mapping = aes(displ, hwy)) + #ggplot, data load, set aesthetics
+  geom_point(aes(color = class)) + #scatterplot of hwy vs displ with class color category differentiation
+  geom_smooth() + #line of fit on top of scatterplot
+  coord_cartesian(xlim = c(5, 7), ylim = c(10, 30)) #adjust x and y limits
+
+mpg %>%
+  filter(displ >= 5, displ <= 7, hwy >= 10, hwy <= 30) %>% #filter rows
+  ggplot(aes(displ, hwy)) + #ggplot, data load, set aesthetics
+  geom_point(aes(color = class)) + #scatterplot of hwy vs displ with class color category differentiation
+  geom_smooth() #line of fit on top of scatterplot
+```
+
+```{r}
+suv <- mpg %>% filter(class == "suv") #create suv dataframe
+compact <- mpg %>% filter(class == "compact") #create compact dataframe
+
+ggplot(suv, aes(displ, hwy, colour = drv)) + #ggplot, data load, set aesthetics
+  geom_point() #scatterplot of hwy vs displ with drv color category differentiation
+
+ggplot(compact, aes(displ, hwy, colour = drv)) + #ggplot, data load, set aesthetics
+  geom_point() #scatterplot of hwy vs displ with drv color category differentiation
+```
+
+```{r}
+x_scale <- scale_x_continuous(limits = range(mpg$displ)) #create x_scale dataframe
+y_scale <- scale_y_continuous(limits = range(mpg$hwy)) #create y_scale dataframe
+col_scale <- scale_colour_discrete(limits = unique(mpg$drv)) #create col_scale dataframe
+
+ggplot(suv, aes(displ, hwy, colour = drv)) + #ggplot, data load, set aesthetics
+  geom_point() + #scatterplot of hwy vs displ with drv color category differentiation
+  x_scale + #adjust x scale
+  y_scale + #adjust y scale
+  col_scale #adjust color scale
+
+ggplot(compact, aes(displ, hwy, colour = drv)) + #ggplot, data load, set aesthetics
+  geom_point() + #scatterplot of hwy vs displ with drv color category differentiation
+  x_scale + #adjust x scale
+  y_scale + #adjust y scale
+  col_scale #adjust color scale
+```
+
+```{r}
+ggplot(mpg, aes(displ, hwy)) +  #ggplot, data load, set aesthetics
+  geom_point(aes(color = class)) + #scatterplot of hwy vs displ with class color category differentiation
+  geom_smooth(se = FALSE) + #line of best fit without standard error
+  theme_bw() #adjust theme
+```
+```{r}
+ggplot(mpg, aes(displ, hwy)) + geom_point() #create scatterplot of hwy vs displ
+
+ggsave("my-plot.pdf") #save plot
+```

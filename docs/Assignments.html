@@ -845,6 +845,512 @@ head(mydates)
 </ol>
 </div>
 </div>
+<div id="exam-2" class="section level1">
+<h1>Exam 2</h1>
+<p>Data description: This dataset provides (simulated) data about 200 police departments in one year. It contains information about the funding received by the department as well as incidents of police brutality. Suppose this dataset (sim.data.csv) was collected by researchers to answer this question: <strong>“Does having more funding in a police department lead to fewer incidents of police brutality?”</strong> d. Codebook: - funds: How much funding the police department received in that year in millions of dollars. - po.brut: How many incidents of police brutality were reported by the department that year. - po.dept.code: Police department code</p>
+<div id="problem-1-eda-10-points" class="section level3">
+<h3>Problem 1: EDA (10 points)</h3>
+<p>Describe the dataset and variables. Perform exploratory data analysis for the two variables of interest: funds and po.brut.</p>
+<pre class="r"><code>#load libraries
+library(knitr)
+library(ggplot2)
+library(tidyverse)</code></pre>
+<pre class="r"><code>dat &lt;- read.csv(file = &#39;sim.data.csv&#39;)
+dim(dat)</code></pre>
+<pre><code>## [1] 200   3</code></pre>
+<pre class="r"><code>sum(is.na(dat$po.dept.code))</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code>sum(is.na(dat$funds))</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code>sum(is.na(dat$po.brut))</code></pre>
+<pre><code>## [1] 0</code></pre>
+<p><strong>Answer: This dataset set contains 200 observations (rows), and each of them represents a police department. The columns (3 total) are attributes of each police department, and they include funds (funding received in millions of dollars for that year), po.brut (number of reported incidents of police brutality) for that year, and po.dept.code (id number for the department, most likely to protect privacy and confidentiality). There are no missing (n/a) values in this dataset.</strong></p>
+<pre class="r"><code>summary(dat)</code></pre>
+<pre><code>##   po.dept.code        funds          po.brut     
+##  Min.   :  1.00   Min.   :21.40   Min.   : 0.00  
+##  1st Qu.: 50.75   1st Qu.:51.67   1st Qu.:14.00  
+##  Median :100.50   Median :59.75   Median :19.00  
+##  Mean   :100.50   Mean   :61.04   Mean   :18.14  
+##  3rd Qu.:150.25   3rd Qu.:72.17   3rd Qu.:22.00  
+##  Max.   :200.00   Max.   :99.70   Max.   :29.00</code></pre>
+<p><strong>Answer: It’s interesting that in this dataset, police departments received at least $21.4 million for that year, and average is $61.04 million. It’s also interesting to that that at least one department reported 0 incidences of police brutality, and the highest number of incidences reported for that year was 22. It’s concerning that the average number of incidences is 18.14.</strong></p>
+<pre class="r"><code>dat %&gt;% ggplot(aes(x=funds)) + geom_histogram() +
+                               xlab(&quot;Funds (millions of dollars)&quot;) +
+                               ggtitle(&quot;Distribution of Funds&quot;)</code></pre>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-37-1.png" width="672" /></p>
+<pre class="r"><code>dat %&gt;% ggplot(aes(x=po.brut)) + geom_histogram() + 
+                                 xlab(&quot;Number of Reported Incidences of Police Brutality&quot;) +
+                                 ggtitle(&quot;Distribution of Police Brutality Incidences&quot;)</code></pre>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-37-2.png" width="672" /> <strong>Answer: These histograms show possible outliers in both funding and number of police brutality incidences. The distribution of funds looks to be possibly bimodal, and the distribution of police brutality looks to be slightly left skewed. These are subjective observations of the graph, but if given a larger sample, these graphs will be more representative of the population distribution of these variables.</strong></p>
+<pre class="r"><code>dat %&gt;% ggplot(aes(x=funds, y=po.brut)) + geom_point() + ggtitle(&quot;Scatterplot of Police Brutality vs. Funds&quot;)</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-38-1.png" width="672" /></p>
+<pre class="r"><code>cor(dat$funds, dat$po.brut)</code></pre>
+<pre><code>## [1] -0.9854706</code></pre>
+<p><strong>Answer: There looks to be a strong negative relationship between funds and po.brut, but it’s concerning that the relationship doesn’t look linear.</strong></p>
+</div>
+<div id="problem-2-linear-regression-30-points" class="section level3">
+<h3>Problem 2: Linear regression (30 points)</h3>
+<ol style="list-style-type: lower-alpha">
+<li>Perform a simple linear regression to answer the question of interest. To do this, name your linear model “reg.output” and write the summary of the regression by using “summary(reg.output)”.</li>
+</ol>
+<pre class="r"><code># Remember to remove eval=FALSE!!
+reg.output &lt;- lm(po.brut ~ funds, data = dat)
+summary(reg.output)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = po.brut ~ funds, data = dat)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.9433 -0.2233  0.2544  0.5952  1.1803 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 40.543069   0.282503  143.51   &lt;2e-16 ***
+## funds       -0.367099   0.004496  -81.64   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.9464 on 198 degrees of freedom
+## Multiple R-squared:  0.9712, Adjusted R-squared:  0.971 
+## F-statistic:  6666 on 1 and 198 DF,  p-value: &lt; 2.2e-16</code></pre>
+<ol start="2" style="list-style-type: lower-alpha">
+<li>Report the estimated coefficient, standard error, and p-value of the slope. Is the relationship between funds and incidents statistically significant? Explain.</li>
+</ol>
+<p><strong>Answer: The estimated coefficient is -0.367099, standard error is 0.004496, and the p-value is &lt;2e-16, which is almost 0. Since the p-value is less than alpha (0.05), we are able to reject the null hypothesis that there is no association between police brutality and funds which means this relationship is statistically significant. Additionally the R-squared of the model is very high which indicates this model fits the data well.</strong></p>
+<ol start="3" style="list-style-type: lower-alpha">
+<li>Draw a scatterplot of po.brut (y-axis) and funds (x-axis). Right below your plot command, use abline to draw the fitted regression line, like this:</li>
+</ol>
+<pre class="r"><code># Remember to remove eval=FALSE!!
+plot(dat$funds, dat$po.brut, xlab = &quot;Funds (millions of dollars)&quot;, ylab = &quot;Number of Reported Incidences of Police Brutality&quot;, main = &quot;Scatterplot of Police Brutality vs. Funds&quot;)
+abline(reg.output, col = &quot;red&quot;, lwd=2)</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-40-1.png" width="384" /> Does the line look like a good fit? Why or why not?</p>
+<p><strong>Answer: No, it does not show a good fit because the data looks curved, and since this is a linear model, it does not fit the data properly. The R-squared is high because the linear fit does model quite a bit of the data, but it fails to capture the overall trend. If there were more observations, this might be the case. Perhaps transformation would be appropriate to apply to capture the fit of the data, but this runs the risk of overfitting. Given the size of the dataset, it would be most beneficial to split the data into test and training data to cross validate.</strong></p>
+<ol start="4" style="list-style-type: lower-alpha">
+<li>Are the four assumptions of linear regression satisfied? To answer this, draw the relevant plots. (Write a maximum of one sentence per assumption.) If not, what might you try to do to improve this (if you had more time)?</li>
+</ol>
+<pre class="r"><code>#residuals vs fitted plots
+plot(reg.output, which = 1)</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-41-1.png" width="672" /></p>
+<pre class="r"><code>#scale location plot
+plot(reg.output, which = 3)</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-41-2.png" width="672" /></p>
+<pre class="r"><code>#residuals vs x plot
+plot(dat$funds, reg.output$residuals, main = &quot;Residuals vs. X&quot;, xlab = &quot;X (Funding in Millions of Dollars)&quot;, ylab = &quot;Residuals&quot;) </code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-41-3.png" width="672" /></p>
+<p><strong>Answer: The linearity assumption is not met because the scatterplot of po.brut vs. funds shows a curved relationship over a linear one, and the residuals vs. x and residuals vs. fitted plots show a distinguishable curved pattern. The independence assumption is not met because there is a pattern shown in the residuals vs. x plot. The equal variance assumption is not satisfied since there are significant trends in the residuals vs. fitted and scale location plots. </strong></p>
+<pre class="r"><code>plot(reg.output, which = 5)</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-42-1.png" width="672" /></p>
+<pre class="r"><code>plot(reg.output, which = 2)</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-42-2.png" width="672" /> <strong>Answer: The normality assumption is violated because the QQ plot does not show a straight line like we want. Since none of the assumptions are met, I would apply a transformation to the model to see if it will help satisfy the assumptions, and to choose which transformation, I would use the Box-Cox method.</strong></p>
+<ol start="5" style="list-style-type: lower-alpha">
+<li>Answer the question of interest based on your analysis.</li>
+</ol>
+<p><strong>Answer: Since none of the assumptions are met, the p-value obtained by the model are optimistic which means the model can’t be used for inference. If the assumptions were met, there would be an associated decrease of reported incidences of police brutality by 0.367099 when funding increases by $1 million. It is possible that it works well for prediction, but as mentioned above, the best way to make sure is to partition the data into test and train. However, with a larger sample size or with transformations, it’s possible the model can be used for statistical inference.</strong></p>
+</div>
+<div id="problem-3-data-ethics-10-points" class="section level3">
+<h3>Problem 3: Data ethics (10 points)</h3>
+<p>Describe the dataset. Considering our lecture on data ethics, what concerns do you have about the dataset? Once you perform your analysis to answer the question of interest using this dataset, what concerns might you have about the results?</p>
+<p><strong>Answer: This dataset contains the funding in millions of dollars for the given year as well as the number of reported incidences of police brutality report by each police department. As discussed in class, the databases of police departments are prone to bias due to the biases of officers. This shows up in predictive policing where the predicted area of crime is overrepresented. Since the incidences of police brutality are reported by each department, this data may be biased and therefore produce biased results (garbage in, garbage out). This data might not completely capture the true amount of police brutality occurring since it may be underreported. It would be interesting if a separate organization is able to cross check this data with a different database of police brutality that is not recorded by police. This would hold police departments accountable in recording data and it would provide a level of fairness.</strong></p>
+</div>
+</div>
+<div id="assignment-4" class="section level1">
+<h1>Assignment 4</h1>
+<pre class="r"><code>#install and load tidyverse library
+#install.packages(&quot;tidyverse&quot;)
+library(tidyverse)</code></pre>
+<pre class="r"><code>ggplot(data = mpg) + #call ggplot function and load data as argument
+  geom_point(mapping = aes(x = displ, y = hwy)) #plot a scatterplot of hwy vs displ</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-44-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(data = mpg) + #call ggplot function and load data as argument
+  geom_point(mapping = aes(x = displ, y = hwy, color = class)) #plot a scatterplot of hwy vs displ by class categories visualized as different colors</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-45-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(data = mpg) + #call ggplot function and load data as argument
+  geom_point(mapping = aes(x = displ, y = hwy, size = class)) #plot a scatterplot of hwy vs displ by class categories visualized as different size points</code></pre>
+<pre><code>## Warning: Using size for a discrete variable is not advised.</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-46-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(data = mpg) + #call ggplot function and load data as argument
+  geom_point(mapping = aes(x = displ, y = hwy, alpha = class)) #plot a scatterplot of hwy vs displ with class categories visualized as different shades of transparency</code></pre>
+<pre><code>## Warning: Using alpha for a discrete variable is not advised.</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-47-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(data = mpg) + #call ggplot function and load data as argument
+  geom_point(mapping = aes(x = displ, y = hwy, shape = class)) #plot a scatterplot of hwy vs displ with class categories visualized as different shapes</code></pre>
+<pre><code>## Warning: The shape palette can deal with a maximum of 6 discrete values because
+## more than 6 becomes difficult to discriminate; you have 7. Consider
+## specifying shapes manually if you must have them.</code></pre>
+<pre><code>## Warning: Removed 62 rows containing missing values (geom_point).</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-48-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(data = mpg) + #call ggplot function and load data as argument
+  geom_point(mapping = aes(x = displ, y = hwy), color = &quot;blue&quot;) #plot a scatterplot of hwy vs displ with blue pointsx</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-49-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(data = mpg) + #call ggplot function and load data as argument
+  geom_point(mapping = aes(x = displ, y = hwy, color = &quot;blue&quot;)) #plot a scatterplot of hwy vs displ with legend=blue</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-50-1.png" width="672" /></p>
+<pre class="r"><code>#do not put &quot;+&quot; at the beginning of a line, always at the end
+#ggplot(data = mpg) #call ggplot function and load data as argument
+#+ geom_point(mapping = aes(x = displ, y = hwy))</code></pre>
+<pre class="r"><code>ggplot(data = mpg) + #call ggplot function and load data as argument
+  geom_point(mapping = aes(x = displ, y = hwy)) + #plot a scatterplot of hwy vs displ
+  facet_wrap(~ class, nrow = 2) #create multiple scatterplots of hwy vs displ across different class categories</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-52-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(data = mpg) + #call ggplot function and load data as argument
+  geom_point(mapping = aes(x = displ, y = hwy)) + #plot a scatterplot of hwy vs displ
+  facet_grid(drv ~ cyl) #create multiple scatterplots of hwy vs displ across different categories (drv and cyl)</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-53-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(data = mpg) + #call ggplot function and load data as argument
+  geom_smooth(mapping = aes(x = displ, y = hwy)) #plot a line of best fit of hwy vs displ</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-54-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(data = mpg) + #call ggplot function and load data as argument
+  geom_smooth(mapping = aes(x = displ, y = hwy, linetype = drv)) #plot a line of best fit of hwy vs displ based on drive train types</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-55-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(data = mpg) + #call ggplot function and load data as argument
+  geom_smooth(mapping = aes(x = displ, y = hwy, linetype = drv, color = drv), show.legend = FALSE) #plot a line of best fit of hwy vs displ based on drive train types in different colors and excluding the legend</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-56-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(data = mpg) + #call ggplot function and load data as argument
+  geom_point(mapping = aes(x = displ, y = hwy)) + #plot a scatterplot of hwy vs displ
+  geom_smooth(mapping = aes(x = displ, y = hwy)) #adding a line of best fit on top of scatterplot</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-57-1.png" width="672" /></p>
+<pre class="r"><code>#another way of writing the previous function
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + #creates aesthetics of the plot
+  geom_point() + #scatterplot of hwy vs displ
+  geom_smooth() #line of fit over scatterplot</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-58-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + #creates aesthetics of the plot
+  geom_point(mapping = aes(color = class)) +#scatterplot of hwy vs displ with color dividing classes
+  geom_smooth() #line of fit over scatterplot</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-59-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + #creates aesthetics of the plot
+  geom_point(mapping = aes(color = class)) +#scatterplot of hwy vs displ with color dividing classes
+  geom_smooth(data = filter(mpg, class == &quot;subcompact&quot;), se = FALSE) #line of fit over scatterplot for only subcompact cars</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-60-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(data = diamonds) + #call ggplot function and load data as argument
+  geom_bar(mapping = aes(x = cut)) #bar chart of diamond cuts</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-61-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(data = diamonds) + #call ggplot function and load data as argument
+  stat_count(mapping = aes(x = cut)) #bar chart of diamond cuts using stat_count</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-62-1.png" width="672" /></p>
+<pre class="r"><code>demo &lt;- tribble( #create data
+  ~cut,         ~freq,
+  &quot;Fair&quot;,       1610,
+  &quot;Good&quot;,       4906,
+  &quot;Very Good&quot;,  12082,
+  &quot;Premium&quot;,    13791,
+  &quot;Ideal&quot;,      21551
+) 
+
+ggplot(data = demo) + #call ggplot function and load data as argument
+  geom_bar(mapping = aes(x = cut, y = freq), stat = &quot;identity&quot;) #bar chart of diamond cuts and frequency</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-63-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(data = diamonds) + #call ggplot function and load data as argument
+  geom_bar(mapping = aes(x = cut, y = stat(prop), group = 1)) #bar chart of diamond cuts by proportion</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-64-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(data = diamonds) + #call ggplot function and load data as argument
+  stat_summary( #plot summary stats of each diamond cut category
+    mapping = aes(x = cut, y = depth), #aesthetics of the plot
+    fun.min = min, #min of each category
+    fun.max = max,#max of each category
+    fun = median#median of each category
+  )</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-65-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(data = diamonds) + #call ggplot function and load data as argument
+  geom_bar(mapping = aes(x = cut, colour = cut)) #bar chart of diamond cuts with bars outlined in color</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-66-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(data = diamonds) + #call ggplot function and load data as argument
+  geom_bar(mapping = aes(x = cut, fill = cut)) #bar chart of diamond cuts with bars filled with color</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-66-2.png" width="672" /></p>
+<pre class="r"><code>ggplot(data = diamonds) + #call ggplot function and load data as argument
+  geom_bar(mapping = aes(x = cut, fill = clarity)) #bar chart of diamond cuts with bar color filling for each clarity category</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-67-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(data = diamonds, mapping = aes(x = cut, fill = clarity)) + #call ggplot function and load data as argument with aesthetics
+  geom_bar(alpha = 1/5, position = &quot;identity&quot;) #barchart of cuts and divided into semitransparent clarity categories</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-68-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(data = diamonds, mapping = aes(x = cut, colour = clarity)) + #call ggplot function and load data as argument with aesthetics
+  geom_bar(fill = NA, position = &quot;identity&quot;) #barchart of cuts and divided into transparent clarity categories</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-68-2.png" width="672" /></p>
+<pre class="r"><code>ggplot(data = diamonds) + #call ggplot function and load data as argument
+  geom_bar(mapping = aes(x = cut, fill = clarity), position = &quot;fill&quot;) #bar chart of diamond cuts with all one height to compare proportions of clarity across cuts</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-69-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(data = diamonds) + #call ggplot function and load data as argument
+  geom_bar(mapping = aes(x = cut, fill = clarity), position = &quot;dodge&quot;) #bar chart of diamond cuts with distribution of clarity for each cut</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-70-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(data = mpg) +  #call ggplot function and load data as argument
+  geom_point(mapping = aes(x = displ, y = hwy), position = &quot;jitter&quot;) #scatterplot of hwy vs displ with points jittered randomly</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-71-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(data = mpg, mapping = aes(x = class, y = hwy)) + #call ggplot function and load data as argument and sets aesthetics
+  geom_boxplot() #boxplot of class and hwy</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-72-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(data = mpg, mapping = aes(x = class, y = hwy)) + #call ggplot function and load data as argument and sets aesthetics
+  geom_boxplot() + #boxplot of class and hwy
+  coord_flip() #flips x and y of plot</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-72-2.png" width="672" /></p>
+<pre class="r"><code>nz &lt;- map_data(&quot;nz&quot;) #create dataframe
+
+ggplot(nz, aes(long, lat, group = group)) + #call ggplot with data and set aesthetics
+  geom_polygon(fill = &quot;white&quot;, colour = &quot;black&quot;) #create map with white fill and black outline</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-73-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(nz, aes(long, lat, group = group)) + #call ggplot with data and set aesthetics
+  geom_polygon(fill = &quot;white&quot;, colour = &quot;black&quot;) + #create map with white fill and black outline
+  coord_quickmap() #sets aspect ratio</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-73-2.png" width="672" /></p>
+<pre class="r"><code>bar &lt;- ggplot(data = diamonds) + #creates bar, calls ggplot and loads data
+  geom_bar( #bar chart
+    mapping = aes(x = cut, fill = cut), #barchart of cut
+    show.legend = FALSE, #don&#39;t show legend
+    width = 1
+  ) + 
+  theme(aspect.ratio = 1) + #color graph with theme
+  labs(x = NULL, y = NULL) #null x and y labels
+
+bar + coord_flip() #flip x and y</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-74-1.png" width="672" /></p>
+<pre class="r"><code>bar + coord_polar() #use polar coordinates</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-74-2.png" width="672" /></p>
+<pre class="r"><code>ggplot(mpg, aes(displ, hwy)) + #call ggplot, load data, and create aesthetics
+  geom_point(aes(color = class)) + #scatterplot of hwy vs displ with color = class
+  geom_smooth(se = FALSE) + #line of fit without standard error
+  labs(title = &quot;Fuel efficiency generally decreases with engine size&quot;) #add title</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-75-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(mpg, aes(displ, hwy)) + #call ggplot, load data, and create aesthetics
+  geom_point(aes(color = class)) + #scatterplot of hwy vs displ with color = class
+  geom_smooth(se = FALSE) + #line of fit without standard error
+  labs(
+    title = &quot;Fuel efficiency generally decreases with engine size&quot;,
+    subtitle = &quot;Two seaters (sports cars) are an exception because of their light weight&quot;,
+    caption = &quot;Data from fueleconomy.gov&quot;
+  ) #add title, subtitle, and caption</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-76-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(mpg, aes(displ, hwy)) + #call ggplot, load data, and create aesthetics
+  geom_point(aes(color = class)) + #scatterplot of hwy vs displ with color = class
+  geom_smooth(se = FALSE) + #line of fit without standard error
+  labs(
+    x = &quot;Engine displacement (L)&quot;,
+    y = &quot;Highway fuel economy (mpg)&quot;,
+    colour = &quot;Car type&quot;
+  ) #add x, y, and legend labels</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-77-1.png" width="672" /></p>
+<pre class="r"><code>df &lt;- tibble(
+  x = runif(10),
+  y = runif(10)
+) #create data
+ggplot(df, aes(x, y)) + #ggplot, load data
+  geom_point() + #scatterplot of y vs x
+  labs(
+    x = quote(sum(x[i] ^ 2, i == 1, n)),
+    y = quote(alpha + beta + frac(delta, theta))
+  ) #create labels for mathmetical expressions for x and y</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-78-1.png" width="672" /></p>
+<pre class="r"><code>best_in_class &lt;- mpg %&gt;% #create best_in_class data
+  group_by(class) %&gt;%
+  filter(row_number(desc(hwy)) == 1) #filter
+
+ggplot(mpg, aes(displ, hwy)) + #ggplot, load data, and set aesthetics
+  geom_point(aes(colour = class)) + #scatterplot of hwy vs displ with color = class
+  geom_text(aes(label = model), data = best_in_class) #create labels for points in best_in_class</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-79-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(mpg, aes(displ, hwy)) + #ggplot, load data, and set aesthetics
+  geom_point(aes(colour = class)) + #scatterplot of hwy vs displ with color = class
+  geom_label(aes(label = model), data = best_in_class, nudge_y = 2, alpha = 0.5) #create labels for points in best_in_class and adjust so they&#39;re not overlapping</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-80-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(mpg, aes(displ, hwy)) + #ggplot, load data, and set aesthetics
+  geom_point(aes(colour = class)) + #scatterplot of hwy vs displ with color = class
+  geom_point(size = 3, shape = 1, data = best_in_class) + #adjust size and data
+  ggrepel::geom_label_repel(aes(label = model), data = best_in_class) #create labels for points in best_in_class and adjust so they&#39;re not overlapping</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-81-1.png" width="672" /></p>
+<pre class="r"><code>class_avg &lt;- mpg %&gt;% #create class_avg dataframe
+  group_by(class) %&gt;%
+  summarise(
+    displ = median(displ),
+    hwy = median(hwy)
+  )
+#&gt; `summarise()` ungrouping output (override with `.groups` argument)
+
+ggplot(mpg, aes(displ, hwy, colour = class)) + #ggplot, data load, and set aesthetics
+  ggrepel::geom_label_repel(aes(label = class), #create labels
+    data = class_avg,
+    size = 6,
+    label.size = 0,
+    segment.color = NA
+  ) +
+  geom_point() + #scatterplot of hwy vs displ
+  theme(legend.position = &quot;none&quot;) #color with theme</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-82-1.png" width="672" /></p>
+<pre class="r"><code>label &lt;- mpg %&gt;% #create label dataframe
+  summarise(
+    displ = max(displ),
+    hwy = max(hwy),
+    label = &quot;Increasing engine size is \nrelated to decreasing fuel economy.&quot;
+  )
+
+ggplot(mpg, aes(displ, hwy)) + #ggplot, data load, and set aesthetics
+  geom_point() + #scatterplot of hwy vs displ
+  geom_text(aes(label = label), data = label, vjust = &quot;top&quot;, hjust = &quot;right&quot;) #create text label</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-83-1.png" width="672" /></p>
+<pre class="r"><code>label &lt;- tibble( #create label dataframe
+  displ = Inf,
+  hwy = Inf,
+  label = &quot;Increasing engine size is \nrelated to decreasing fuel economy.&quot;
+)
+
+ggplot(mpg, aes(displ, hwy)) + #ggplot, data load, and set aesthetics
+  geom_point() + #scatterplot of hwy vs displ
+  geom_text(aes(label = label), data = label, vjust = &quot;top&quot;, hjust = &quot;right&quot;) #create text labels on the border</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-84-1.png" width="672" /></p>
+<pre class="r"><code>#add line breaks given the number of characters chosen per line
+&quot;Increasing engine size is related to decreasing fuel economy.&quot; %&gt;%
+  stringr::str_wrap(width = 40) %&gt;%
+  writeLines()</code></pre>
+<pre><code>## Increasing engine size is related to
+## decreasing fuel economy.</code></pre>
+<pre class="r"><code>#&gt; Increasing engine size is related to
+#&gt; decreasing fuel economy.</code></pre>
+<pre class="r"><code>ggplot(mpg, aes(displ, hwy)) + #ggplot, data load, and set aesthetics
+  geom_point(aes(colour = class)) #scatterplot of hwy vs displ with class color differentiation</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-86-1.png" width="672" /></p>
+<pre class="r"><code>#default scales of the above plot (behind the scenes)
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(aes(colour = class)) +
+  scale_x_continuous() +
+  scale_y_continuous() +
+  scale_colour_discrete()</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-86-2.png" width="672" /></p>
+<pre class="r"><code>ggplot(mpg, aes(displ, hwy)) + #ggplot, data load, and set aesthetics
+  geom_point() + #scatterplot of hwy vs displ
+  scale_y_continuous(breaks = seq(15, 40, by = 5)) #controls position of ticks in plot</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-87-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(mpg, aes(displ, hwy)) + #ggplot, data load, and set aesthetics
+  geom_point() + #scatterplot of hwy vs displ
+  scale_x_continuous(labels = NULL) + #no labels for ticks on x axis
+  scale_y_continuous(labels = NULL) #no labels for ticks on y axis</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-88-1.png" width="672" /></p>
+<pre class="r"><code>presidential %&gt;%
+  mutate(id = 33 + row_number()) %&gt;%
+  ggplot(aes(start, id)) +
+    geom_point() + #scatterplot of id vs start
+    geom_segment(aes(xend = end, yend = id)) + #scale of plot
+    scale_x_date(NULL, breaks = presidential$start, date_labels = &quot;&#39;%y&quot;) #controls ticks and labels of x axis</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-89-1.png" width="672" /></p>
+<pre class="r"><code>base &lt;- ggplot(mpg, aes(displ, hwy)) +  #ggplot, data load, and set aesthetics
+  geom_point(aes(colour = class)) #scatterplot of hwy vs displ with class differentiation
+
+base + theme(legend.position = &quot;left&quot;) #legend on left</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-90-1.png" width="672" /></p>
+<pre class="r"><code>base + theme(legend.position = &quot;top&quot;) #legend on top</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-90-2.png" width="672" /></p>
+<pre class="r"><code>base + theme(legend.position = &quot;bottom&quot;) #legend on bottom</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-90-3.png" width="672" /></p>
+<pre class="r"><code>base + theme(legend.position = &quot;right&quot;) # the default</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-90-4.png" width="672" /></p>
+<pre class="r"><code>ggplot(mpg, aes(displ, hwy)) + #ggplot, data load, and set aesthetics
+  geom_point(aes(colour = class)) + #scatterplot of hwy vs displ with class differentiation
+  geom_smooth(se = FALSE) + #line of fit without standard error
+  theme(legend.position = &quot;bottom&quot;) + #position of legend at bottom
+  guides(colour = guide_legend(nrow = 1, override.aes = list(size = 4))) #layout of legend in 1 row</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-91-1.png" width="672" /></p>
+<pre class="r"><code>#&gt; `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
+<pre class="r"><code>ggplot(diamonds, aes(carat, price)) + #ggplot, data load, and set aesthetics
+  geom_bin2d() #heatmap of 2d bins</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-92-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(diamonds, aes(log10(carat), log10(price))) + #ggplot, data load, and log of aesthetics
+  geom_bin2d() #heatmap of 2d bins</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-92-2.png" width="672" /></p>
+<pre class="r"><code>ggplot(diamonds, aes(carat, price)) + #ggplot, data load, set aesthetics
+  geom_bin2d() + #heatmap of 2d bins
+  scale_x_log10() + #log10 of x scale
+  scale_y_log10() #log10 of y scale</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-93-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(mpg, aes(displ, hwy)) + #ggplot, data load, set aesthetics
+  geom_point(aes(color = drv)) #scatterplot of hwy vs displ with drv color category differentiation</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-94-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(mpg, aes(displ, hwy)) + #ggplot, data load, set aesthetics
+  geom_point(aes(color = drv)) + #scatterplot of hwy vs displ with drv color category differentiation
+  scale_colour_brewer(palette = &quot;Set1&quot;) #scale by color</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-94-2.png" width="672" /></p>
+<pre class="r"><code>ggplot(mpg, aes(displ, hwy)) + #ggplot, data load, set aesthetics
+  geom_point(aes(color = drv, shape = drv)) + #scatterplot of hwy vs displ with drv color category and shape differentiation
+  scale_colour_brewer(palette = &quot;Set1&quot;) #scale by color</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-95-1.png" width="672" /></p>
+<pre class="r"><code>presidential %&gt;%
+  mutate(id = 33 + row_number()) %&gt;% #select columns and rows
+  ggplot(aes(start, id, colour = party)) + #ggplot, data load, set aesthetics
+    geom_point() + #scatterplot
+    geom_segment(aes(xend = end, yend = id)) + #segment plot
+    scale_colour_manual(values = c(Republican = &quot;red&quot;, Democratic = &quot;blue&quot;)) #color scale for certain points</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-96-1.png" width="672" /></p>
+<pre class="r"><code>df &lt;- tibble( #create data
+  x = rnorm(10000),
+  y = rnorm(10000)
+)
+ggplot(df, aes(x, y)) + #ggplot, data load, set aesthetics
+  geom_hex() + #create hexagonal shape
+  coord_fixed() #fixed aspect ratio</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-97-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(df, aes(x, y)) + #ggplot, data load, set aesthetics
+  geom_hex() + #create hexagonal shape
+  #viridis::scale_fill_viridis() + #contrasting colors in shape
+  coord_fixed() #fixed aspect ratio</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-97-2.png" width="672" /></p>
+<pre class="r"><code>ggplot(mpg, mapping = aes(displ, hwy)) + #ggplot, data load, set aesthetics
+  geom_point(aes(color = class)) + #scatterplot of hwy vs displ with class color category differentiation
+  geom_smooth() + #line of fit on top of scatterplot
+  coord_cartesian(xlim = c(5, 7), ylim = c(10, 30)) #adjust x and y limits</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-98-1.png" width="672" /></p>
+<pre class="r"><code>mpg %&gt;%
+  filter(displ &gt;= 5, displ &lt;= 7, hwy &gt;= 10, hwy &lt;= 30) %&gt;% #filter rows
+  ggplot(aes(displ, hwy)) + #ggplot, data load, set aesthetics
+  geom_point(aes(color = class)) + #scatterplot of hwy vs displ with class color category differentiation
+  geom_smooth() #line of fit on top of scatterplot</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-98-2.png" width="672" /></p>
+<pre class="r"><code>suv &lt;- mpg %&gt;% filter(class == &quot;suv&quot;) #create suv dataframe
+compact &lt;- mpg %&gt;% filter(class == &quot;compact&quot;) #create compact dataframe
+
+ggplot(suv, aes(displ, hwy, colour = drv)) + #ggplot, data load, set aesthetics
+  geom_point() #scatterplot of hwy vs displ with drv color category differentiation</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-99-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(compact, aes(displ, hwy, colour = drv)) + #ggplot, data load, set aesthetics
+  geom_point() #scatterplot of hwy vs displ with drv color category differentiation</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-99-2.png" width="672" /></p>
+<pre class="r"><code>x_scale &lt;- scale_x_continuous(limits = range(mpg$displ)) #create x_scale dataframe
+y_scale &lt;- scale_y_continuous(limits = range(mpg$hwy)) #create y_scale dataframe
+col_scale &lt;- scale_colour_discrete(limits = unique(mpg$drv)) #create col_scale dataframe
+
+ggplot(suv, aes(displ, hwy, colour = drv)) + #ggplot, data load, set aesthetics
+  geom_point() + #scatterplot of hwy vs displ with drv color category differentiation
+  x_scale + #adjust x scale
+  y_scale + #adjust y scale
+  col_scale #adjust color scale</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-100-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(compact, aes(displ, hwy, colour = drv)) + #ggplot, data load, set aesthetics
+  geom_point() + #scatterplot of hwy vs displ with drv color category differentiation
+  x_scale + #adjust x scale
+  y_scale + #adjust y scale
+  col_scale #adjust color scale</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-100-2.png" width="672" /></p>
+<pre class="r"><code>ggplot(mpg, aes(displ, hwy)) +  #ggplot, data load, set aesthetics
+  geom_point(aes(color = class)) + #scatterplot of hwy vs displ with class color category differentiation
+  geom_smooth(se = FALSE) + #line of best fit without standard error
+  theme_bw() #adjust theme</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-101-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(mpg, aes(displ, hwy)) + geom_point() #create scatterplot of hwy vs displ</code></pre>
+<p><img src="Assignments_files/figure-html/unnamed-chunk-102-1.png" width="672" /></p>
+<pre class="r"><code>ggsave(&quot;my-plot.pdf&quot;) #save plot</code></pre>
+<pre><code>## Saving 7 x 5 in image</code></pre>
+</div>
 
 
 
