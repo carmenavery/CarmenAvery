@@ -1253,24 +1253,28 @@ summary(ols.race)
 
 ### Assumptions
 
+**Linearity**
+
+Looking at the below residuals vs. fitted plot, we can see that the scatterplot smoother, showing the average value of the residuals at each value of fitted value, is pretty much flat across the plot. However, there are a group of outlying data points at the top right of the graph. The flatness of the red line indicates that there is no discernable non-linear pattern to the data. While the group of outlier data points is concerning, we will cautiously decide to proceed as though the linearity assumption is satisfied.
+
+**Independence**
+
+While the independence assumption cannot be proved as true, we can see from the Residuals vs. Fitted plot that there does not seem to be any discernible pattern of the data, suggesting that the variables are independent of each other. We must note the outlying points in the top right corner of the plot, but it is unclear at this point in our analysis how influential they may be. Therefore, we will also cautiously consider the independence assumption satisfied.
+
+**Homoscedasticity**
+
+In the Scale-Location plot shown below, there is a clear trend to the red line on this plot, and there is a significant group of data points that do not fit the trend at the top right corner. This plot indicates that the residuals have non-constant variance. Therefore, the homoscedasticity assumption, that all the errors have the same variance, is not satisfied by this data.
+
+**Normality**
+
+As seen in the below normal Q-Qplot, the data really do not follow the trend of the line. Not only are they grouped in certain areas, but they also extend far past the line, to both the left and right, in each different grouping of data points. This demonstrates to us that the data is not normally distributed and does not satisfy the normality assumption. 
+
 ```{r}
 plot(ols.race, which=1)
 plot(ols.race, which=3)
 plot(ols.race, which=5)
 plot(ols.race)
 ```
-
-**Linearity**
-Looking at the below residuals vs. fitted plot, we can see that the scatterplot smoother, showing the average value of the residuals at each value of fitted value, is pretty much flat across the plot. However, there are a group of outlying data points at the top right of the graph. The flatness of the red line indicates that there is no discernable non-linear pattern to the data. While the group of outlier data points is concerning, we will cautiously decide to proceed as though the linearity assumption is satisfied.
-
-**Independence**
-While the independence assumption cannot be proved as true, we can see from the Residuals vs. Fitted plot that there does not seem to be any discernible pattern of the data, suggesting that the variables are independent of each other. We must note the outlying points in the top right corner of the plot, but it is unclear at this point in our analysis how influential they may be. Therefore, we will also cautiously consider the independence assumption satisfied.
-
-**Homoscedasticity**
-In the Scale-Location plot shown below, there is a clear trend to the red line on this plot, and there is a significant group of data points that do not fit the trend at the top right corner. This plot indicates that the residuals have non-constant variance. Therefore, the homoscedasticity assumption, that all the errors have the same variance, is not satisfied by this data.
-
-**Normality**
-As seen in the below normal Q-Qplot, the data really do not follow the trend of the line. Not only are they grouped in certain areas, but they also extend far past the line, to both the left and right, in each different grouping of data points. This demonstrates to us that the data is not normally distributed and does not satisfy the normality assumption. 
 
 ### Regression Results / Causal Analysis
 
@@ -1280,6 +1284,7 @@ Although this is a very interesting topic to examine, it is not currently, and w
 ### Causal DAG
 
 ![](/Users/carmenavery/Documents/Penn/Senior/Fall/CRIM 250/GitHub Website/CarmenAvery/images/DAG.png)
+
 ### Discussion and Ideas for Future Work
 
 Based on the linear regression analysis which regressed race onto Custody Agency data, there does not appear to be a statistically significant relationship between race and those released back into Philadelphia from city vs. state prisons/jails. However, there are a few factors that make us unsure of the reliability of this conclusion. Firstly, this data set did not meet all of the assumptions for performing a linear regression analysis. The Normality, Homoscedasticity, and Independence assumptions were not met, and the Linearity assumption was not solidly met. This is likely due to the fact that both variables were coded as binary, and a logistic regression would probably have been a better fit for this dataset and question. Secondly, even if the assumptions had been met to perform a linear regression for this data, any results found may not tell the whole story. Given that the demographics of Philadelphia prisons include higher proportions of people of color (11.8% White vs. 88.2% POC in 2015),[2] if an accurately completed regression had indicated that there was a positive association between being released from the State or PDP and being a person of color, this may just come down to there being more people of color in prisons to be released. Given these demographics, the result that would be interesting would be a positive association between being released and being white, or even no association at all, which would indicate potential discrimination in the release process. If one were to complete future research using this data set and transforming the data to perform linear regression, these are all factors that would have to be taken into consideration.
