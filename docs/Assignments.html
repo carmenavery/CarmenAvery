@@ -1538,11 +1538,8 @@ untouched.releases &lt;- releases</code></pre>
      xlab = &quot;Sex&quot;)</code></pre>
 <p><img src="Assignments_files/figure-html/unnamed-chunk-112-1.png" width="672" /></p>
 <p><strong>Custody Agency and Releases</strong></p>
-<p>In the below histogram, demonstrating the frequency of release by Custody Agency (0 - 0.5 representing the Phila Dept of Prisons and 0.5 - 1 representing the State Prison System), we can see that the Philadelphia Department of Prisons released many more inmates in 2015 than did the state system.</p>
-<pre class="r"><code>releases$custody_numeric &lt;- 0
-releases$custody_numeric[releases$custody_agency == &quot;State&quot;] &lt;- 1
-
-barplot(table(releases$custody_agency),
+<p>In the below histogram, we can see that the Philadelphia Department of Prisons released many more inmates in 2015 than did the state system.</p>
+<pre class="r"><code>barplot(table(releases$custody_agency),
      main = &quot;Barplot of Custody Agencies&quot;,
      ylab = &quot;Frequency&quot;,
      xlab = &quot;Custody Agency&quot;)</code></pre>
@@ -1551,7 +1548,10 @@ barplot(table(releases$custody_agency),
 <div id="linear-regression" class="section level3">
 <h3>Linear Regression</h3>
 <p>For the analysis of this data set, we chose to do a linear regression as our model. We transformed the ‘custody_agency’ variable to be binary in which 1 = PDP and 0 = State, and we performed a transformation of the ‘race_ethnicity’ variable to be binary in which 0 = White and 1 = Black, Asian, Hispanic, and Other. We regressed the custody agency (binary) on race/ethnicity (binary) to look at the relationship between these variables. In the sections below we will address the assumptions to perform a linear regression, look at the results of the regression, and discuss the results and conclusions of the regression analysis.</p>
-<pre class="r"><code>releases$race_eth_binary &lt;- revalue(releases$race_ethnicity,c(&quot;White&quot; = 0,
+<pre class="r"><code>releases$custody_numeric &lt;- 0
+releases$custody_numeric[releases$custody_agency == &quot;State&quot;] &lt;- 1
+
+releases$race_eth_binary &lt;- revalue(releases$race_ethnicity,c(&quot;White&quot; = 0,
                                                                &quot;Asian&quot; = 1,
                                                                &quot;Hispanic&quot; = 1,
                                                                &quot;Other&quot; = 1,

@@ -1229,12 +1229,9 @@ barplot(table(releases$sex),
 
 **Custody Agency and Releases**
 
-In the below histogram, demonstrating the frequency of release by Custody Agency (0 - 0.5 representing the Phila Dept of Prisons and 0.5 - 1 representing the State Prison System), we can see that the Philadelphia Department of Prisons released many more inmates in 2015 than did the state system.
+In the below histogram, we can see that the Philadelphia Department of Prisons released many more inmates in 2015 than did the state system.
 
 ```{r}
-releases$custody_numeric <- 0
-releases$custody_numeric[releases$custody_agency == "State"] <- 1
-
 barplot(table(releases$custody_agency),
      main = "Barplot of Custody Agencies",
      ylab = "Frequency",
@@ -1246,6 +1243,9 @@ barplot(table(releases$custody_agency),
 For the analysis of this data set, we chose to do a linear regression as our model. We transformed the ‘custody_agency’ variable to be binary in which 1 = PDP and 0 = State, and we performed a transformation of the ‘race_ethnicity’ variable to be binary in which 0 = White and 1 = Black, Asian, Hispanic, and Other. We regressed the custody agency (binary) on race/ethnicity (binary) to look at the relationship between these variables. In the sections below we will address the assumptions to perform a linear regression, look at the results of the regression, and discuss the results and conclusions of the regression analysis.
 
 ```{r}
+releases$custody_numeric <- 0
+releases$custody_numeric[releases$custody_agency == "State"] <- 1
+
 releases$race_eth_binary <- revalue(releases$race_ethnicity,c("White" = 0,
                                                                "Asian" = 1,
                                                                "Hispanic" = 1,
