@@ -1514,13 +1514,15 @@ untouched.releases &lt;- releases</code></pre>
 <div id="exploratory-data-analysis" class="section level3">
 <h3>Exploratory Data Analysis</h3>
 <p>The following exploratory data analysis will examine the main variable of interest, race, as well as each of the other demographic factors with number of releases in order to get a preliminary understanding of the relationship between the variables.</p>
-<p><strong>Race and Releases</strong> This barplot shows the distribution of race/ethnicity of people released. The highest number are Black followed by white and Hispanic. This is likely due in part to the disparities in incarceration rates of people of color as compared to whites, but the large differences between these frequencies calls for further exploration of this variable as it relates to releases. This could also be due to the racial demographics of Philadelphia.</p>
+<p><strong>Race and Releases</strong></p>
+<p>This barplot shows the distribution of race/ethnicity of people released. The highest number are Black followed by white and Hispanic. This is likely due in part to the disparities in incarceration rates of people of color as compared to whites, but the large differences between these frequencies calls for further exploration of this variable as it relates to releases. This could also be due to the racial demographics of Philadelphia.</p>
 <pre class="r"><code>barplot(table(releases$race_ethnicity),
         main = &#39;Barplot of Race/Ethnicity&#39;,
         xlab = &#39;Race/Ethnicity&#39;,
         ylab = &#39;Frequency&#39;)</code></pre>
 <p><img src="Assignments_files/figure-html/unnamed-chunk-110-1.png" width="672" /></p>
-<p><strong>Age and Releases</strong> In the below histogram we see that the data distribution is skewed to the right, with the most common age range of those released being between the ages of 20 and 40. This is likely due to the fact that this is also the most common age for crime and offending in general, and there is likely a higher proportion of inmates between 20 and 40 overall.</p>
+<p><strong>Age and Releases</strong></p>
+<p>In the below histogram we see that the data distribution is skewed to the right, with the most common age range of those released being between the ages of 20 and 40. This is likely due to the fact that this is also the most common age for crime and offending in general, and there is likely a higher proportion of inmates between 20 and 40 overall.</p>
 <pre class="r"><code>hist(releases$age,
      main = &quot;Histogram of Ages&quot;,
      xlab = &quot;Age&quot;,
@@ -1528,13 +1530,15 @@ untouched.releases &lt;- releases</code></pre>
      ylim = c(0, 5000),
      xlim = c(0,100))</code></pre>
 <p><img src="Assignments_files/figure-html/unnamed-chunk-111-1.png" width="672" /></p>
-<p><strong>Sex and Releases</strong> In the below histogram we see that there were far more male inmates released than female. This is likely due to the fact that there are higher populations of male inmates in Philadelphia prisons (and prisons in general) overall, so there are more of them to be released.</p>
+<p><strong>Sex and Releases</strong></p>
+<p>In the below histogram we see that there were far more male inmates released than female. This is likely due to the fact that there are higher populations of male inmates in Philadelphia prisons (and prisons in general) overall, so there are more of them to be released.</p>
 <pre class="r"><code>barplot(table(releases$sex),
      main = &quot;Barplot of Sex&quot;,
      ylab = &quot;Frequency&quot;,
      xlab = &quot;Sex&quot;)</code></pre>
 <p><img src="Assignments_files/figure-html/unnamed-chunk-112-1.png" width="672" /></p>
-<p><strong>Custody Agency and Releases</strong> In the below histogram, demonstrating the frequency of release by Custody Agency (0 - 0.5 representing the Phila Dept of Prisons and 0.5 - 1 representing the State Prison System), we can see that the Philadelphia Department of Prisons released many more inmates in 2015 than did the state system.</p>
+<p><strong>Custody Agency and Releases</strong></p>
+<p>In the below histogram, demonstrating the frequency of release by Custody Agency (0 - 0.5 representing the Phila Dept of Prisons and 0.5 - 1 representing the State Prison System), we can see that the Philadelphia Department of Prisons released many more inmates in 2015 than did the state system.</p>
 <pre class="r"><code>releases$custody_numeric &lt;- 0
 releases$custody_numeric[releases$custody_agency == &quot;State&quot;] &lt;- 1
 
@@ -1603,7 +1607,8 @@ summary(ols.race)</code></pre>
 <div id="discussion-and-ideas-for-future-work" class="section level3">
 <h3>Discussion and Ideas for Future Work</h3>
 <p>Based on the linear regression analysis which regressed race onto Custody Agency data, there does not appear to be a statistically significant relationship between race and those released back into Philadelphia from city vs. state prisons/jails. However, there are a few factors that make us unsure of the reliability of this conclusion. Firstly, this data set did not meet all of the assumptions for performing a linear regression analysis. The Normality, Homoscedasticity, and Independence assumptions were not met, and the Linearity assumption was not solidly met. This is likely due to the fact that both variables were coded as binary, and a logistic regression would probably have been a better fit for this dataset and question. Secondly, even if the assumptions had been met to perform a linear regression for this data, any results found may not tell the whole story. Given that the demographics of Philadelphia prisons include higher proportions of people of color (11.8% White vs. 88.2% POC in 2015),[2] if an accurately completed regression had indicated that there was a positive association between being released from the State or PDP and being a person of color, this may just come down to there being more people of color in prisons to be released. Given these demographics, the result that would be interesting would be a positive association between being released and being white, or even no association at all, which would indicate potential discrimination in the release process. If one were to complete future research using this data set and transforming the data to perform linear regression, these are all factors that would have to be taken into consideration. Despite not finding a causal relationship in our analysis, identifying bias and other problems in the prison system, especially regarding releases, is still worthwhile. Future research could include an examination of early releases versus releases of prisoners at the end of their sentence. Such an analysis could also include studying the behavior of inmates during their incarceration and how they are treated by prison staff and fellow inmates, factors which all work together to affect the possibility of early release. Additionally, since eligibility for parole is determined by human decision making, it is a process during which there can unfortunately be racial bias. A study of this issue could analyze racial disparities between inmates who are granted parole and those who have applied but are denied parole. This future research would also have to take the higher proportions of POC inmates into account when completing the statistical analysis. Another associated topic is sentencing. Research of bias in this department could address sentencing length disparities between people who committed the same type of crime but are of different races.</p>
-<p>[1] People released to Philadelphia from prison &amp; jail. OpenDataPhilly. (2018, March 8). Retrieved November 21, 2021, from <a href="https://www.opendataphilly.org/dataset/prison-releases" class="uri">https://www.opendataphilly.org/dataset/prison-releases</a>. [2] ​​“Philadelphia Jail Population Report | July 2015 – April 2019.” Research and Development First Judicial District of Pennsylvania. Phila Gov. Accessed December 3, 2021. <a href="https://www.phila.gov/media/20190513144034/April-2019-Full-Jail-Report.pdf" class="uri">https://www.phila.gov/media/20190513144034/April-2019-Full-Jail-Report.pdf</a>.</p>
+<p>[1] People released to Philadelphia from prison &amp; jail. OpenDataPhilly. (2018, March 8). Retrieved November 21, 2021, from <a href="https://www.opendataphilly.org/dataset/prison-releases" class="uri">https://www.opendataphilly.org/dataset/prison-releases</a>.</p>
+<p>[2] ​​“Philadelphia Jail Population Report | July 2015 – April 2019.” Research and Development First Judicial District of Pennsylvania. Phila Gov. Accessed December 3, 2021. <a href="https://www.phila.gov/media/20190513144034/April-2019-Full-Jail-Report.pdf" class="uri">https://www.phila.gov/media/20190513144034/April-2019-Full-Jail-Report.pdf</a>.</p>
 </div>
 </div>
 
